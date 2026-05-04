@@ -27,6 +27,38 @@
 
 
 
+# name: CI
+
+# on:
+#   push:
+#     branches: ["main"]
+
+# jobs:
+#   test:
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - uses: actions/checkout@v4
+
+#       - name: Install Node
+#         uses: actions/setup-node@v4
+#         with:
+#           node-version: 18
+
+#       - name: Install dependencies
+#         run: npm install --legacy-peer-deps
+
+#       - name: Run ESLint
+#         run: npx eslint . || true
+
+
+
+
+
+
+
+
+
 name: CI
 
 on:
@@ -50,3 +82,9 @@ jobs:
 
       - name: Run ESLint
         run: npx eslint . || true
+
+      # 👉 ITO NO ZAVA-DEHIBE
+      - name: SonarQube Scan
+        uses: SonarSource/sonarcloud-github-action@v2
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
