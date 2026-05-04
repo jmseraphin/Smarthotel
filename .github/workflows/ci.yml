@@ -56,8 +56,6 @@
 
 
 
-
-
 name: CI
 
 on:
@@ -82,7 +80,7 @@ jobs:
       - name: Run ESLint
         run: npx eslint . || true
 
-      # 👉 ITO NO ZAVA-DEHIBE
+      # 👉 SONAR FIX COMPLET
       - name: SonarQube Scan
         uses: SonarSource/sonarcloud-github-action@v2
         env:
@@ -91,3 +89,5 @@ jobs:
           args: >
             -Dsonar.projectKey=jmseraphin_Smarthotel
             -Dsonar.organization=jmseraphin
+            -Dsonar.sources=.
+            -Dsonar.exclusions=**/node_modules/**
