@@ -55,7 +55,6 @@
 
 
 
-
 name: CI
 
 on:
@@ -67,7 +66,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Install Node
         uses: actions/setup-node@v4
@@ -77,10 +77,9 @@ jobs:
       - name: Install dependencies
         run: npm install --legacy-peer-deps
 
-      - name: Run ESLint
-        run: npx eslint . || true
+      - name: Run tests with coverage
+        run: npm test -- --coverage
 
-      # 👉 SONAR FIX COMPLET
       - name: SonarQube Scan
         uses: SonarSource/sonarcloud-github-action@v2
         env:
@@ -90,4 +89,6 @@ jobs:
             -Dsonar.projectKey=jmseraphin_Smarthotel
             -Dsonar.organization=jmseraphin
             -Dsonar.sources=.
-            -Dsonar.exclusions=**/node_modules/**
+            -Dsonar.tests=tests
+            -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
+            -Dsonar.exclusions=**/node_modules/**,**/coverage/**,**/tests/**
