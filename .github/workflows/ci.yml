@@ -54,7 +54,6 @@
 
 
 
-
 name: CI
 
 on:
@@ -75,7 +74,7 @@ jobs:
           node-version: 18
 
       - name: Install dependencies
-        run: npm install --legacy-peer-deps
+        run: npm ci || npm install --legacy-peer-deps
 
       - name: Run tests with coverage
         run: npm test -- --coverage
@@ -91,4 +90,4 @@ jobs:
             -Dsonar.sources=.
             -Dsonar.tests=tests
             -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info
-            -Dsonar.exclusions=**/node_modules/**,**/coverage/**,**/tests/**
+            -Dsonar.exclusions=**/node_modules/**,**/coverage/**
