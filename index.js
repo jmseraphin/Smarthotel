@@ -132,67 +132,56 @@
 
 
 
-
-
 const express = require("express");
 const app = express();
 
 app.use(express.json());
 
-// fonctions séparées
-function applySeason(total, season) {
-  if (season === "Haute") return total * 1.5;
-  return total;
-}
+// 🔥 logique centralisée (manala duplication)
+function calculateTotal(data) {
+  let total = data.pricePerNight * data.nights;
 
-function applyWeekend(total, hasWeekend) {
-  if (hasWeekend) return total * 1.2;
-  return total;
-}
+  if (data.season === "Haute") {
+    total *= 1.5;
+  }
 
-function applyLongStay(total, nights) {
-  if (nights > 7) return total * 0.85;
-  return total;
-}
+  if (data.hasWeekend) {
+    total *= 1.2;
+  }
 
-function applySeaView(total, seaView, nights) {
-  if (seaView) return total + 30 * nights;
-  return total;
-}
+  if (data.nights > 7) {
+    total *= 0.85;
+  }
 
-function applyBreakfast(total, clientType, persons, nights) {
-  if (clientType !== "VIP") return total + 15 * persons * nights;
+  if (data.seaView) {
+    total += 30 * data.nights;
+  }
+
+  if (data.clientType !== "VIP") {
+    total += 15 * data.persons * data.nights;
+  }
+
   return total;
 }
 
 app.post("/api/book-room", (req, res) => {
-  let {
-    pricePerNight,
-    nights,
-    season,
-    hasWeekend,
-    seaView,
-    clientType,
-    persons
-  } = req.body;
+  const data = req.body;
 
-  let total = pricePerNight * nights;
+  // validation simple (manampy reliability A)
+  if (!data.pricePerNight || !data.nights) {
+    return res.status(400).json({ error: "Invalid input" });
+  }
 
-  total = applySeason(total, season);
-  total = applyWeekend(total, hasWeekend);
-  total = applyLongStay(total, nights);
-  total = applySeaView(total, seaView, nights);
-  total = applyBreakfast(total, clientType, persons, nights);
+  const total = calculateTotal(data);
 
   res.json({ total });
 });
 
-// 👉 IMPORTANT ho an'ny test
+// test friendly
 if (require.main === module) {
   app.listen(3000, () => {
     console.log("Server running on port 3000");
   });
 }
 
-// 👉 export
 module.exports = app;
