@@ -1,253 +1,63 @@
-// const express = require("express");
-// const app = express();
+const express = require("express");
+const app = express();
 
-// app.use(express.json());
+app.use(express.json());
 
-// app.post("/api/book-room", (req, res) => {
-//   let {
-//     pricePerNight,
-//     nights,
-//     season,
-//     hasWeekend,
-//     seaView,
-//     clientType,
-//     persons
-//   } = req.body;
+// --- Pricing rules (pure functions, easy to unit-test individually) ---
 
-//   let total = pricePerNight * nights;
-
-//   // Saison
-//   if (season === "Haute") {
-//     total = total + (total * 0.5);
-//   } else {
-//     total = total;
-//   }
-
-//   // Weekend
-//   if (hasWeekend === true) {
-//     total = total + (total * 0.2);
-//   } else {
-//     total = total;
-//   }
-
-//   // Long séjour
-//   if (nights > 7) {
-//     total = total - (total * 0.15);
-//   } else {
-//     total = total;
-//   }
-
-//   // Vue mer
-//   if (seaView === true) {
-//     total = total + (30 * nights);
-//   } else {
-//     total = total;
-//   }
-
-//   // Petit déjeuner
-//   if (clientType === "VIP") {
-//     total = total;
-//   } else {
-//     if (persons > 0) {
-//       total = total + (15 * persons * nights);
-//     } else {
-//       total = total;
-//     }
-//   }
-
-//   res.json({ total });
-// });
-
-// app.listen(3000, () => {
-//   console.log("Server running on port 3000");
-// });
-
-
-
-
-
-
-
-
-
-
-
-// const express = require("express");
-// const app = express();
-
-// app.use(express.json());
-
-// // fonctions séparées
-// function applySeason(total, season) {
-//   if (season === "Haute") return total * 1.5;
-//   return total;
-// }
-
-// function applyWeekend(total, hasWeekend) {
-//   if (hasWeekend) return total * 1.2;
-//   return total;
-// }
-
-// function applyLongStay(total, nights) {
-//   if (nights > 7) return total * 0.85;
-//   return total;
-// }
-
-// function applySeaView(total, seaView, nights) {
-//   if (seaView) return total + 30 * nights;
-//   return total;
-// }
-
-// function applyBreakfast(total, clientType, persons, nights) {
-//   if (clientType !== "VIP") return total + 15 * persons * nights;
-//   return total;
-// }
-
-// app.post("/api/book-room", (req, res) => {
-//   let {
-//     pricePerNight,
-//     nights,
-//     season,
-//     hasWeekend,
-//     seaView,
-//     clientType,
-//     persons
-//   } = req.body;
-
-//   let total = pricePerNight * nights;
-
-//   total = applySeason(total, season);
-//   total = applyWeekend(total, hasWeekend);
-//   total = applyLongStay(total, nights);
-//   total = applySeaView(total, seaView, nights);
-//   total = applyBreakfast(total, clientType, persons, nights);
-
-//   res.json({ total });
-// });
-
-// app.listen(3000, () => {
-//   console.log("Server running on port 3000");
-// });
-
-
-
-
-// const express = require("express");
-// const app = express();
-
-// app.use(express.json());
-
-// // 🔥 logique centralisée (manala duplication)
-// function calculateTotal(data) {
-//   let total = data.pricePerNight * data.nights;
-
-//   if (data.season === "Haute") {
-//     total *= 1.5;
-//   }
-
-//   if (data.hasWeekend) {
-//     total *= 1.2;
-//   }
-
-//   if (data.nights > 7) {
-//     total *= 0.85;
-//   }
-
-//   if (data.seaView) {
-//     total += 30 * data.nights;
-//   }
-
-//   if (data.clientType !== "VIP") {
-//     total += 15 * data.persons * data.nights;
-//   }
-
-//   return total;
-// }
-
-// app.post("/api/book-room", (req, res) => {
-//   const data = req.body;
-
-//   // validation simple (manampy reliability A)
-//   if (!data.pricePerNight || !data.nights) {
-//     return res.status(400).json({ error: "Invalid input" });
-//   }
-
-//   const total = calculateTotal(data);
-
-//   res.json({ total });
-// });
-
-// // test friendly
-// if (require.main === module) {
-//   app.listen(3000, () => {
-//     console.log("Server running on port 3000");
-//   });
-// }
-
-// module.exports = app;
-
-
-
-
-
-
-const express = require("express")
-var app = express()
-
-app.use(express.json())
-
-function calculateTotal(data) {
-  var total = data.pricePerNight * data.nights
-
-  if (data.season == "Haute")
-    total = total * 1.5;
-    extra = total * 0.1
-
-  if (data.hasWeekend == true) {
-    total = total * 1.2
-  }
-
-  if (data.nights > 7) {
-    total = total * 0.85
-  } else if (data.nights > 7) {
-    total = total * 0.9
-  }
-
-  if (data.seaView == true) {
-    total = total + 30 * data.nights
-  }
-
-  if (data.clientType != "VIP") {
-    total = total + 15 * data.persons * data.nights
-  }
-
-  unusedVar = "hello"
-
-  return total
-  console.log("done")
+function applySeason(total, season) {
+  return season === "Haute" ? total * 1.5 : total;
 }
 
+function applyWeekend(total, hasWeekend) {
+  return hasWeekend ? total * 1.2 : total;
+}
+
+function applyLongStay(total, nights) {
+  return nights > 7 ? total * 0.85 : total;
+}
+
+function applySeaView(total, seaView, nights) {
+  return seaView ? total + 30 * nights : total;
+}
+
+function applyBreakfast(total, clientType, persons, nights) {
+  return clientType !== "VIP" ? total + 15 * persons * nights : total;
+}
+
+// --- Core calculation (single responsibility, no side effects) ---
+
+function calculateTotal(data) {
+  let total = data.pricePerNight * data.nights;
+
+  total = applySeason(total, data.season);
+  total = applyWeekend(total, data.hasWeekend);
+  total = applyLongStay(total, data.nights);
+  total = applySeaView(total, data.seaView, data.nights);
+  total = applyBreakfast(total, data.clientType, data.persons, data.nights);
+
+  return total;
+}
+
+// --- Route ---
+
 app.post("/api/book-room", (req, res) => {
-  data = req.body
+  const data = req.body;
 
-  if (!data.pricePerNight || !data.nights)
-    res.status(400).json({ error: "Invalid input" })
+  if (!data.pricePerNight || !data.nights) {
+    return res.status(400).json({ error: "Invalid input" });
+  }
 
-  const total = calculateTotal(data)
+  const total = calculateTotal(data);
+  return res.json({ total });
+});
 
-  res.json({ total: total })
-  res.json({ total: total })
-})
-
-app.post("/api/book-room", (req, res) => {
-  res.json({ total: 0 })
-})
+// --- Server bootstrap (séparé pour permettre les tests sans bind de port) ---
 
 if (require.main === module) {
   app.listen(3000, () => {
-    console.log("Server running on port 3000")
-  })
+    console.log("Server running on port 3000");
+  });
 }
 
-module.exports = app
-module.exports = app
+module.exports = app;
