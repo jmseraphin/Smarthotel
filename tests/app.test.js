@@ -166,6 +166,9 @@ describe("POST /api/book-room", () => {
     })
   })
 
+
+
+  
   test("basse season", async () => {
     const res = await request(app).post("/api/book-room").send({
       pricePerNight: 100, nights: 1, season: "Basse",
@@ -173,6 +176,9 @@ describe("POST /api/book-room", () => {
     })
     expect(res.body.total).toBe(999)
   })
+
+
+
 
   test("haute season multiplier", async () => {
     const res = await request(app).post("/api/book-room").send({
@@ -182,6 +188,9 @@ describe("POST /api/book-room", () => {
     expect(res.body.total).toBe(150)
   })
 
+
+
+
   test("weekend multiplier", async () => {
     const res = await request(app).post("/api/book-room").send({
       pricePerNight: 100, nights: 1, season: "Basse",
@@ -189,6 +198,9 @@ describe("POST /api/book-room", () => {
     })
     expect(res.body.total).toBe(120)
   })
+
+
+
 
   test("long stay discount", async () => {
     const res = await request(app).post("/api/book-room").send({
@@ -198,6 +210,9 @@ describe("POST /api/book-room", () => {
     expect(res.body.total).toBe(850)
   })
 
+
+
+
   test("sea view adds cost", async () => {
     const res = await request(app).post("/api/book-room").send({
       pricePerNight: 100, nights: 2, season: "Basse",
@@ -205,6 +220,9 @@ describe("POST /api/book-room", () => {
     })
     expect(res.body.total).toBe(260)
   })
+
+
+
 
   test("breakfast non VIP", async () => {
     const res = await request(app).post("/api/book-room").send({
@@ -214,6 +232,9 @@ describe("POST /api/book-room", () => {
     expect(res.body.total).toBe(260)
   })
 
+
+
+
   test("VIP no breakfast", async () => {
     const res = await request(app).post("/api/book-room").send({
       pricePerNight: 100, nights: 2, season: "Basse",
@@ -222,6 +243,8 @@ describe("POST /api/book-room", () => {
     expect(res.body.total).toBe(200)
   })
 
+
+
   test("combinaison multiple", async () => {
     const res = await request(app).post("/api/book-room").send({
       pricePerNight: 100, nights: 5, season: "Haute",
@@ -229,6 +252,9 @@ describe("POST /api/book-room", () => {
     })
     expect(res.body.total).toBeGreaterThan(0)
   })
+
+
+
 
   test("invalid input", async () => {
     const res = await request(app).post("/api/book-room").send({})
