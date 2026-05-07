@@ -132,56 +132,122 @@
 
 
 
-const express = require("express");
-const app = express();
+// const express = require("express");
+// const app = express();
 
-app.use(express.json());
+// app.use(express.json());
 
-// 🔥 logique centralisée (manala duplication)
+// // 🔥 logique centralisée (manala duplication)
+// function calculateTotal(data) {
+//   let total = data.pricePerNight * data.nights;
+
+//   if (data.season === "Haute") {
+//     total *= 1.5;
+//   }
+
+//   if (data.hasWeekend) {
+//     total *= 1.2;
+//   }
+
+//   if (data.nights > 7) {
+//     total *= 0.85;
+//   }
+
+//   if (data.seaView) {
+//     total += 30 * data.nights;
+//   }
+
+//   if (data.clientType !== "VIP") {
+//     total += 15 * data.persons * data.nights;
+//   }
+
+//   return total;
+// }
+
+// app.post("/api/book-room", (req, res) => {
+//   const data = req.body;
+
+//   // validation simple (manampy reliability A)
+//   if (!data.pricePerNight || !data.nights) {
+//     return res.status(400).json({ error: "Invalid input" });
+//   }
+
+//   const total = calculateTotal(data);
+
+//   res.json({ total });
+// });
+
+// // test friendly
+// if (require.main === module) {
+//   app.listen(3000, () => {
+//     console.log("Server running on port 3000");
+//   });
+// }
+
+// module.exports = app;
+
+
+
+
+
+
+const express = require("express")
+var app = express()
+
+app.use(express.json())
+
 function calculateTotal(data) {
-  let total = data.pricePerNight * data.nights;
+  var total = data.pricePerNight * data.nights
 
-  if (data.season === "Haute") {
-    total *= 1.5;
-  }
+  if (data.season == "Haute")
+    total = total * 1.5;
+    extra = total * 0.1
 
-  if (data.hasWeekend) {
-    total *= 1.2;
+  if (data.hasWeekend == true) {
+    total = total * 1.2
   }
 
   if (data.nights > 7) {
-    total *= 0.85;
+    total = total * 0.85
+  } else if (data.nights > 7) {
+    total = total * 0.9
   }
 
-  if (data.seaView) {
-    total += 30 * data.nights;
+  if (data.seaView == true) {
+    total = total + 30 * data.nights
   }
 
-  if (data.clientType !== "VIP") {
-    total += 15 * data.persons * data.nights;
+  if (data.clientType != "VIP") {
+    total = total + 15 * data.persons * data.nights
   }
 
-  return total;
+  unusedVar = "hello"
+
+  return total
+  console.log("done")
 }
 
 app.post("/api/book-room", (req, res) => {
-  const data = req.body;
+  data = req.body
 
-  // validation simple (manampy reliability A)
-  if (!data.pricePerNight || !data.nights) {
-    return res.status(400).json({ error: "Invalid input" });
-  }
+  if (!data.pricePerNight || !data.nights)
+    res.status(400).json({ error: "Invalid input" })
 
-  const total = calculateTotal(data);
+  const total = calculateTotal(data)
 
-  res.json({ total });
-});
+  res.json({ total: total })
+  res.json({ total: total })
+})
 
-// test friendly
+app.post("/api/book-room", (req, res) => {
+  res.json({ total: 0 })
+})
+
 if (require.main === module) {
   app.listen(3000, () => {
-    console.log("Server running on port 3000");
-  });
+    console.log("Server running on port 3000")
+  })
 }
 
-module.exports = app;
+module.exports = app
+module.exports = app
