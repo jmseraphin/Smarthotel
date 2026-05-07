@@ -52,12 +52,21 @@ app.post("/api/book-room", (req, res) => {
   return res.json({ total });
 });
 
-// --- Server bootstrap (séparé pour permettre les tests sans bind de port) ---
+// --- Server bootstrap ---
 
+/* istanbul ignore next */
 if (require.main === module) {
   app.listen(3000, () => {
     console.log("Server running on port 3000");
   });
 }
 
-module.exports = app;
+module.exports = {
+  app,
+  applySeason,
+  applyWeekend,
+  applyLongStay,
+  applySeaView,
+  applyBreakfast,
+  calculateTotal,
+};

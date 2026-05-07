@@ -1,5 +1,94 @@
 const request = require("supertest");
-const app = require("../index");
+const {
+  app,
+  applySeason,
+  applyWeekend,
+  applyLongStay,
+  applySeaView,
+  applyBreakfast,
+  calculateTotal,
+} = require("../index");
+
+// ─────────────────────────────────────────────
+// Unit tests — fonctions helpers (couverture branches)
+// ─────────────────────────────────────────────
+
+describe("applySeason", () => {
+  test("Haute saison → ×1.5", () => {
+    expect(applySeason(100, "Haute")).toBe(150);
+  });
+  test("Basse saison → inchangé", () => {
+    expect(applySeason(100, "Basse")).toBe(100);
+  });
+});
+
+describe("applyWeekend", () => {
+  test("weekend actif → ×1.2", () => {
+    expect(applyWeekend(100, true)).toBe(120);
+  });
+  test("pas de weekend → inchangé", () => {
+    expect(applyWeekend(100, false)).toBe(100);
+  });
+});
+
+describe("applyLongStay", () => {
+  test("plus de 7 nuits → ×0.85", () => {
+    expect(applyLongStay(1000, 10)).toBe(850);
+  });
+  test("7 nuits ou moins → inchangé", () => {
+    expect(applyLongStay(1000, 7)).toBe(1000);
+  });
+});
+
+describe("applySeaView", () => {
+  test("vue mer → +30 par nuit", () => {
+    expect(applySeaView(200, true, 3)).toBe(290);
+  });
+  test("pas de vue mer → inchangé", () => {
+    expect(applySeaView(200, false, 3)).toBe(200);
+  });
+});
+
+describe("applyBreakfast", () => {
+  test("client Normal → +15 par personne par nuit", () => {
+    expect(applyBreakfast(200, "Normal", 2, 2)).toBe(260);
+  });
+  test("client VIP → pas de petit-déjeuner", () => {
+    expect(applyBreakfast(200, "VIP", 2, 2)).toBe(200);
+  });
+});
+
+describe("calculateTotal", () => {
+  test("calcul complet avec tous les modificateurs", () => {
+    // 100*2=200 → *1.5=300 → *1.2=360 → +30*2=420 → +15*2*2=480
+    expect(calculateTotal({
+      pricePerNight: 100,
+      nights: 2,
+      season: "Haute",
+      hasWeekend: true,
+      seaView: true,
+      clientType: "Normal",
+      persons: 2,
+    })).toBe(480);
+  });
+
+  test("calcul minimal sans aucun modificateur", () => {
+    // 100*1 = 100
+    expect(calculateTotal({
+      pricePerNight: 100,
+      nights: 1,
+      season: "Basse",
+      hasWeekend: false,
+      seaView: false,
+      clientType: "VIP",
+      persons: 0,
+    })).toBe(100);
+  });
+});
+
+// ─────────────────────────────────────────────
+// Integration tests — route POST /api/book-room
+// ─────────────────────────────────────────────
 
 describe("POST /api/book-room", () => {
 
@@ -29,7 +118,7 @@ describe("POST /api/book-room", () => {
       persons: 1,
     });
     expect(res.statusCode).toBe(200);
-    // 100*1 = 100, aucun modificateur
+    // 100*1 = 100
     expect(res.body.total).toBe(100);
   });
 
@@ -78,6 +167,21 @@ describe("POST /api/book-room", () => {
     expect(res.body.total).toBe(850);
   });
 
+  test("séjour ≤7 nuits — pas de réduction", async () => {
+    const res = await request(app).post("/api/book-room").send({
+      pricePerNight: 100,
+      nights: 7,
+      season: "Basse",
+      hasWeekend: false,
+      seaView: false,
+      clientType: "VIP",
+      persons: 1,
+    });
+    expect(res.statusCode).toBe(200);
+    // 100*7 = 700
+    expect(res.body.total).toBe(700);
+  });
+
   test("vue mer — +30€ par nuit", async () => {
     const res = await request(app).post("/api/book-room").send({
       pricePerNight: 100,
@@ -119,11 +223,11 @@ describe("POST /api/book-room", () => {
       persons: 2,
     });
     expect(res.statusCode).toBe(200);
-    // 100*2 = 200, pas de petit-déj
+    // 100*2 = 200
     expect(res.body.total).toBe(200);
   });
 
-  test("combinaison multiple — résultat positif", async () => {
+  test("combinaison multiple — résultat correct", async () => {
     const res = await request(app).post("/api/book-room").send({
       pricePerNight: 100,
       nights: 5,
@@ -138,8 +242,24 @@ describe("POST /api/book-room", () => {
     expect(res.body.total).toBe(1200);
   });
 
-  test("input invalide — 400", async () => {
+  test("input invalide (body vide) — 400", async () => {
     const res = await request(app).post("/api/book-room").send({});
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toBe("Invalid input");
+  });
+
+  test("input invalide (nights manquant) — 400", async () => {
+    const res = await request(app).post("/api/book-room").send({
+      pricePerNight: 100,
+    });
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toBe("Invalid input");
+  });
+
+  test("input invalide (pricePerNight manquant) — 400", async () => {
+    const res = await request(app).post("/api/book-room").send({
+      nights: 3,
+    });
     expect(res.statusCode).toBe(400);
     expect(res.body.error).toBe("Invalid input");
   });
