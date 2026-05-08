@@ -100,7 +100,7 @@ describe("POST /api/book-room", () => {
       season: "Basse",
       hasWeekend: false,
       seaView: false,
-      clientType: "VIP",
+      clientType: "VIPe",
       persons: 2,
     });
     expect(res.body.total).toBe(200);
