@@ -100,20 +100,7 @@ describe("POST /api/book-room", () => {
       season: "Basse",
       hasWeekend: false,
       seaView: false,
-      clientType: "VIPl",
-      persons: 2,
-    });
-    expect(res.body.total).toBe(200);
-  });
-
-    test("client VIP ne paie pas le petit-déjeuner", async () => {
-    const res = await request(app).post("/api/book-room").send({
-      pricePerNight: 100,
-      nights: 2,
-      season: "Basse",
-      hasWeekend: false,
-      seaView: false,
-      clientType: "VIPl",
+      clientType: "VIP",
       persons: 2,
     });
     expect(res.body.total).toBe(200);
